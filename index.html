@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="description" content="Maestro Cooler - Edge AI Smartphone Cooler powered by ESP32-C3 via Web Bluetooth.">
+  <meta name="theme-color" content="#0066ff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Maestro">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Maestro Cooler</title>
+
+  <!-- PWA Manifest & Icons -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="assets/pwa-icon.svg">
+  <link rel="icon" type="image/png" sizes="192x192" href="assets/pwa-icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="assets/pwa-icon-512.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+
+  <!-- Google Fonts: Outfit for clean, modern Apple-grade typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+
+  <!-- Core Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ====================================================================
+       ONBOARDING / WELCOME SCREEN (First Launch Experience)
+       ==================================================================== -->
+  <div id="onboardingScreen" class="onboarding-screen">
+    <div class="onboarding-card">
+      <!-- Background Ambient Waves -->
+      <svg class="onboarding-bg-waves" viewBox="0 0 430 650" fill="none" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M430,40 C310,90 270,240 350,420 C390,510 430,560 430,560 Z" fill="url(#waveGrad1)"/>
+        <path d="M430,160 C260,190 190,340 260,500 C300,580 380,620 430,640 Z" fill="url(#waveGrad2)"/>
+        <path d="M0,540 C110,490 240,540 370,640 L0,640 Z" fill="url(#waveGrad1)"/>
+        <defs>
+          <linearGradient id="waveGrad1" x1="0" y1="0" x2="430" y2="650" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#007aff" stop-opacity="0.08"/>
+            <stop offset="60%" stop-color="#00c6ff" stop-opacity="0.10"/>
+            <stop offset="100%" stop-color="#0066ff" stop-opacity="0.03"/>
+          </linearGradient>
+          <linearGradient id="waveGrad2" x1="430" y1="0" x2="0" y2="650" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.14"/>
+            <stop offset="100%" stop-color="#0066ff" stop-opacity="0.02"/>
+          </linearGradient>
+        </defs>
+      </svg>
+
+      <!-- Top Header -->
+      <div class="onboarding-header">
+        <div class="onboarding-brand">
+          <div class="onboarding-brand-name">M A E S T R O</div>
+          <div class="onboarding-brand-sub">Smart Cooling for<br>A Better Experience</div>
+        </div>
+        <button type="button" class="onboarding-skip-btn" id="btnOnboardingSkip">Skip</button>
+      </div>
+
+      <!-- Hero Title & Subtitle -->
+      <div class="onboarding-hero-text">
+        <h1 class="onboarding-title">
+          Cooler<br>
+          Control<br>
+          <span class="highlight-blue">Smarter</span>
+        </h1>
+        <p class="onboarding-desc">
+          Monitor temperature, adjust fan speed, and let AI keep your device cool automatically.
+        </p>
+      </div>
+
+      <!-- Center Visual Section: Badges (Left) + Hero Cooler Image (Right) -->
+      <div class="onboarding-visual-section">
+        <!-- Feature Badges -->
+        <div class="onboarding-features-list">
+          <div class="onboarding-feature-item">
+            <div class="onboarding-feature-icon">
+              <svg viewBox="0 -32 512 576" fill="currentColor">
+                <path d="M288.2 0c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 62.1-15-15c-9.4-9.4-24.6-9.4-33.9 0s-9.4 24.6 0 33.9l49 49 0 70.6-61.2-35.3-17.9-66.9c-3.4-12.8-16.6-20.4-29.4-17S95.3 98 98.7 110.8l5.5 20.5-53.7-31C35.2 91.5 15.6 96.7 6.8 112s-3.6 34.9 11.7 43.7l53.7 31-20.5 5.5c-12.8 3.4-20.4 16.6-17 29.4s16.6 20.4 29.4 17l66.9-17.9 61.2 35.3-61.2 35.3-66.9-17.9c-12.8-3.4-26 4.2-29.4 17s4.2 26 17 29.4l20.5 5.5-53.7 31C3.2 365.1-2 384.7 6.8 400s28.4 20.6 43.7 11.7l53.7-31-5.5 20.5c-3.4 12.8 4.2 26 17 29.4s26-4.2 29.4-17l17.9-66.9 61.2-35.3 0 70.6-49 49c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l15-15 0 62.1c0 17.7 14.3 32 32 32s32-14.3 32-32l0-62.1 15 15c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-49-49 0-70.6 61.2 35.3 17.9 66.9c3.4 12.8 16.6 20.4 29.4 17s20.4-16.6 17-29.4l-5.5-20.5 53.7 31c15.3 8.8 34.9 3.6 43.7-11.7s3.6-34.9-11.7-43.7l-53.7-31 20.5-5.5c12.8-3.4 20.4-16.6 17-29.4s-16.6-20.4-29.4-17l-66.9 17.9-61.2-35.3 61.2-35.3 66.9 17.9c12.8 3.4 26-4.2 29.4-17s-4.2-26-17-29.4l-20.5-5.5 53.7-31c15.3-8.8 20.6-28.4 11.7-43.7s-28.4-20.5-43.7-11.7l-53.7 31 5.5-20.5c3.4-12.8-4.2-26-17-29.4s-26 4.2-29.4 17l-17.9 66.9-61.2 35.3 0-70.6 49-49c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-15 15 0-62.1z"/>
+              </svg>
+            </div>
+            <span class="onboarding-feature-label">Lower<br>Temperature</span>
+          </div>
+
+          <div class="onboarding-feature-item">
+            <div class="onboarding-feature-icon">
+              <svg viewBox="0 0 512 512" fill="currentColor">
+                <path d="M160 144c0-79.5 64.5-144 144-144 8.8 0 16 7.2 16 16l0 152.2c15-5.3 31.2-8.2 48-8.2 79.5 0 144 64.5 144 144 0 8.8-7.2 16-16 16l-152.2 0c5.3 15 8.2 31.2 8.2 48 0 79.5-64.5 144-144 144-8.8 0-16-7.2-16-16l0-152.2c-15 5.3-31.2 8.2-48 8.2-79.5 0-144-64.5-144-144 0-8.8 7.2-16 16-16l152.2 0c-5.3-15-8.2-31.2-8.2-48zm96 144a32 32 0 1 0 0-64 32 32 0 1 0 0 64z"/>
+              </svg>
+            </div>
+            <span class="onboarding-feature-label">Smarter<br>Cooling</span>
+          </div>
+
+          <div class="onboarding-feature-item">
+            <div class="onboarding-feature-icon">
+              <svg viewBox="0 -16 448 544" fill="currentColor">
+                <path d="M338.8-9.9c11.9 8.6 16.3 24.2 10.9 37.8L271.3 224 416 224c13.5 0 25.5 8.4 30.1 21.1s.7 26.9-9.6 35.5l-288 240c-11.3 9.4-27.4 9.9-39.3 1.3s-16.3-24.2-10.9-37.8L176.7 288 32 288c-13.5 0-25.5-8.4-30.1-21.1s-.7-26.9 9.6-35.5l288-240c11.3-9.4 27.4-9.9 39.3-1.3z"/>
+              </svg>
+            </div>
+            <span class="onboarding-feature-label">Better<br>Performance</span>
+          </div>
+        </div>
+
+        <!-- 3D Hero Cooler Protruding from Right -->
+        <div class="onboarding-cooler-wrap">
+          <img src="assets/hero.png" alt="Maestro Cooler" class="onboarding-cooler-img" id="onboardingHeroImg">
+        </div>
+      </div>
+
+      <!-- Bottom CTA Section -->
+      <div class="onboarding-bottom-section">
+        <button type="button" class="onboarding-get-started-btn" id="btnGetStarted">
+          <span>Get Started</span>
+          <div class="btn-arrow-circle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#0066ff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </div>
+        </button>
+        <div class="onboarding-footer-text">A Cooler Future with Maestro</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================================================================
+       FAN ANIMATION TRANSITION OVERLAY (Blurred Background on Exit)
+       ==================================================================== -->
+  <div id="fanTransitionOverlay" class="fan-transition-overlay" aria-hidden="true">
+    <div class="fan-transition-center">
+      <div class="fan-pulse-rings">
+        <div class="fan-pulse-ring"></div>
+        <div class="fan-pulse-ring"></div>
+        <div class="fan-pulse-ring"></div>
+      </div>
+      <div class="fan-circle-spinner">
+        <svg viewBox="0 0 100 100" class="fan-spinning-svg">
+          <circle cx="50" cy="50" r="14" fill="#0066ff"/>
+          <path d="M50 36 C50 16 68 8 72 16 C75 22 66 35 50 36 Z" fill="#38bdf8"/>
+          <path d="M64 50 C84 50 92 68 84 72 C78 75 65 66 64 50 Z" fill="#007aff"/>
+          <path d="M50 64 C50 84 32 92 28 84 C25 78 34 65 50 64 Z" fill="#0056e0"/>
+          <path d="M36 50 C16 50 8 32 16 28 C22 25 35 34 36 50 Z" fill="#60a5fa"/>
+          <circle cx="50" cy="50" r="6" fill="#ffffff"/>
+        </svg>
+      </div>
+      <div class="fan-transition-text">Starting Maestro Cooler...</div>
+      <div class="fan-transition-subtext">Initializing AI thermal controller</div>
+    </div>
+  </div>
+
+  <!-- Ambient Light Background Glows -->
+  <div class="ambient-glow top-left"></div>
+  <div class="ambient-glow top-right"></div>
+
+  <!-- Main Mobile App Container -->
+  <div class="app-container">
+
+    <!-- ====================================================================
+         TOP APP HEADER
+         ==================================================================== -->
+    <header class="app-header">
+      <!-- Left: Infinity Logo & Brand -->
+      <div class="brand-block">
+        <div class="brand-logo-wrap">
+          <img src="assets/logo.svg" alt="Maestro Logo" class="brand-infinity-icon">
+        </div>
+        <div class="brand-text">
+          <div class="brand-title">MAESTRO</div>
+          <div class="brand-subtitle">COOLER</div>
+          <div class="brand-status-row" id="btnConnectionStatus" title="Klik untuk menghubungkan Bluetooth">
+            <span class="status-dot" id="headerStatusDot"></span>
+            <span class="status-text" id="headerStatusText">Disconnected</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Action Icons (Theme Toggle, Notifications & BLE Connect) -->
+      <div class="header-actions">
+        <button type="button" class="icon-action-btn" id="btnThemeToggle" aria-label="Toggle Dark/Light Mode" title="Toggle Dark/Light Mode">
+          <!-- Sun icon (shown in dark mode) -->
+          <svg class="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+          <!-- Moon icon (shown in light mode) -->
+          <svg class="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+
+        <button type="button" class="icon-action-btn" id="btnNotifications" aria-label="Notifications" title="System Notifications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          <span class="notification-indicator" id="notifIndicator"></span>
+        </button>
+
+        <button type="button" class="icon-action-btn btn-ble-connect" id="btnBleAction" aria-label="Connect Bluetooth" title="Connect Bluetooth">
+          <svg id="headerBleIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m7 7 10 10-5 5V2l5 5L7 17"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Scrollable Screen Content -->
+    <main class="app-main-content">
+
+      <!-- ====================================================================
+           VIEW 1: HOME SCREEN
+           ==================================================================== -->
+      <section id="viewHome" class="tab-view active">
+
+        <!-- Card 1: Cold Plate Temperature (Hero Card with 3D Cooler Image) -->
+        <div class="app-card hero-temp-card">
+          <div class="card-top-label">
+            <svg class="snowflake-icon" viewBox="0 0 24 24" fill="none" stroke="#0066ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="2" x2="12" y2="22"/>
+              <line x1="2" y1="12" x2="22" y2="12"/>
+              <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+              <line x1="19.07" y1="4.93" x2="4.93" y2="19.07"/>
+              <path d="M9 3l3 3 3-3"/>
+              <path d="M9 21l3-3 3 3"/>
+              <path d="M3 9l3 3-3 3"/>
+              <path d="M21 9l-3 3 3 3"/>
+            </svg>
+            <span>Cold Plate</span>
+          </div>
+
+          <div class="hero-temp-layout">
+            <!-- Left: Temperature & Status -->
+            <div class="hero-temp-details">
+              <div class="hero-temp-val-wrap">
+                <span class="hero-temp-val" id="heroTempVal">-</span>
+                <span class="hero-temp-unit">°C</span>
+                <!-- Mini Dynamic Turbine Fan -->
+                <div class="mini-fan-wrapper paused" id="miniFanWrapper" title="Indikator Putaran Kipas Fan">
+                  <svg class="mini-fan-svg" id="miniFanSvg" viewBox="0 0 100 100" fill="none">
+                    <defs>
+                      <linearGradient id="turbineBladeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#003bb3"/>
+                        <stop offset="50%" stop-color="#0057e7"/>
+                        <stop offset="100%" stop-color="#0070f3"/>
+                      </linearGradient>
+                      <path id="turbineBlade" d="M 44 38 C 38 24 43 10 58 4 C 64 3 67 7 64 13 C 57 24 55 32 54 38 Z" fill="url(#turbineBladeGrad)" stroke="#0035a0" stroke-width="0.8"/>
+                    </defs>
+                    <!-- 7 Bold Aerodynamic Turbine Blades -->
+                    <use href="#turbineBlade"/>
+                    <use href="#turbineBlade" transform="rotate(51.43 50 50)"/>
+                    <use href="#turbineBlade" transform="rotate(102.86 50 50)"/>
+                    <use href="#turbineBlade" transform="rotate(154.29 50 50)"/>
+                    <use href="#turbineBlade" transform="rotate(205.71 50 50)"/>
+                    <use href="#turbineBlade" transform="rotate(257.14 50 50)"/>
+                    <use href="#turbineBlade" transform="rotate(308.57 50 50)"/>
+                    <!-- Solid Center Hub -->
+                    <circle cx="50" cy="50" r="14" fill="#003bb3"/>
+                    <circle cx="50" cy="50" r="7" fill="#ffffff"/>
+                    <circle cx="50" cy="50" r="3.5" fill="#0057e7"/>
+                  </svg>
+                </div>
+              </div>
+
+              <div class="temp-status-pill offline" id="heroStatusPill">
+                <span class="pill-dot"></span>
+                <span class="pill-text" id="heroStatusPillText">Offline</span>
+              </div>
+
+              <!-- Visual Progress / Thermal Level Gauge -->
+              <div class="temp-progress-bar-wrap">
+                <div class="temp-progress-bar-fill" id="tempProgressBar" style="width: 0%;"></div>
+              </div>
+
+              <div class="temp-meta-subrow">
+                <span class="meta-hot" id="heroHotLabel">Hot Side: <strong id="heroHotVal">-</strong></span>
+                <span class="meta-divider">›</span>
+                <span class="meta-stability offline" id="heroStabilityWrap">
+                  <span class="stability-dot" id="heroStabilityDot"></span>
+                  <span id="heroStabilityText">Offline</span>
+                </span>
+              </div>
+            </div>
+
+            <!-- Right: 3D Cooler Physical Image -->
+            <div class="hero-cooler-media">
+              <div class="cooler-img-halo"></div>
+              <img src="assets/hero.png" alt="Maestro Cooler 3D" class="cooler-hero-img" id="heroCoolerImg">
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: Fan Speed (Compact 5V / 9V / 12V with Free Continuous Slider) -->
+        <div class="app-card fan-mode-card">
+          <div class="card-header-row">
+            <div class="section-heading">Speed</div>
+            <div class="speed-live-badge" id="speedLiveBadge">
+              <span class="speed-live-pct" id="speedLivePct">100%</span>
+            </div>
+          </div>
+
+          <!-- 3 Mode Buttons (5V / 9V / 12V) -->
+          <div class="fan-mode-grid" role="group" aria-label="Cooling Mode Selection">
+            <button type="button" class="fan-mode-tile" data-mode="5" id="btnTile5">
+              <span class="tile-voltage">5V</span>
+              <span class="tile-label">Silent</span>
+            </button>
+
+            <button type="button" class="fan-mode-tile" data-mode="9" id="btnTile9">
+              <span class="tile-voltage">9V</span>
+              <span class="tile-label">Balanced</span>
+            </button>
+
+            <button type="button" class="fan-mode-tile active" data-mode="12" id="btnTile12">
+              <span class="tile-voltage">12V</span>
+              <span class="tile-label">Turbo</span>
+            </button>
+          </div>
+
+          <!-- Stepped Notch Slider (Free Continuous Dragging with 5V/9V/12V Notches) -->
+          <div class="stepped-slider-container">
+            <div class="stepped-track-wrap" id="steppedTrackWrap">
+              <div class="stepped-track" id="steppedTrack">
+                <div class="stepped-fill" id="steppedFill" style="width: 100%;"></div>
+              </div>
+              <div class="stepped-ticks">
+                <div class="stepped-tick" data-step="5" data-val="15" id="tick5">
+                  <span class="tick-dot"><span class="tick-dot-inner"></span></span>
+                  <span class="tick-label">5V</span>
+                </div>
+                <div class="stepped-tick" data-step="9" data-val="50" id="tick9">
+                  <span class="tick-dot"><span class="tick-dot-inner"></span></span>
+                  <span class="tick-label">9V</span>
+                </div>
+                <div class="stepped-tick active" data-step="12" data-val="100" id="tick12">
+                  <span class="tick-dot"><span class="tick-dot-inner"></span></span>
+                  <span class="tick-label">12V</span>
+                </div>
+              </div>
+              <div class="stepped-thumb" id="steppedThumb" role="slider" aria-valuemin="15" aria-valuemax="100" aria-valuenow="100" aria-label="Cooling Fan Speed Slider" tabindex="0">
+                <div class="stepped-thumb-bubble" id="steppedThumbBubble">100%</div>
+                <div class="stepped-thumb-inner"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- Card 3: Temperature Graph (Real-time Live Canvas) -->
+        <div class="app-card chart-card">
+          <div class="card-header-row">
+            <div class="section-heading">Temperature Graph</div>
+            <span class="chart-subtitle">Cold side</span>
+          </div>
+
+          <div class="chart-container">
+            <canvas id="homeTempChart" width="370" height="165"></canvas>
+            <div class="chart-floating-bubble" id="chartLiveBadge">-</div>
+          </div>
+        </div>
+
+        <!-- 2-Column Quick Stats Row -->
+        <div class="quick-stats-row">
+          <!-- Lowest Temp Card -->
+          <div class="app-card stat-mini-card">
+            <div class="stat-mini-icon blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#0066ff" stroke-width="2.2">
+                <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>
+              </svg>
+            </div>
+            <div class="stat-mini-info">
+              <span class="stat-mini-label">Lowest</span>
+              <span class="stat-mini-val" id="quickLowestTemp">-</span>
+            </div>
+          </div>
+
+          <!-- Cooling Time Card -->
+          <div class="app-card stat-mini-card">
+            <div class="stat-mini-icon blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#0066ff" stroke-width="2.2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <div class="stat-mini-info">
+              <span class="stat-mini-label">Duration</span>
+              <span class="stat-mini-val font-mono" id="quickCoolingTime">-</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4: AI Cooling Toggle Card -->
+        <div class="app-card ai-toggle-card" id="cardAiToggle">
+          <div class="ai-card-left">
+            <div class="ai-mini-badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#0066ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-2.04z"/>
+                <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-2.04z"/>
+              </svg>
+            </div>
+            <div class="ai-card-texts">
+              <div class="ai-card-title">Adaptive AI</div>
+            </div>
+          </div>
+
+          <div class="ai-card-right">
+            <label class="ios-switch">
+              <input type="checkbox" id="toggleAiCooling" checked>
+              <span class="ios-slider"></span>
+            </label>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ====================================================================
+           VIEW 2: STATISTICS SCREEN
+           ==================================================================== -->
+      <section id="viewStats" class="tab-view">
+
+        <!-- Top Navigation Bar for Subview -->
+        <div class="subview-header">
+          <button type="button" class="subview-back-btn" id="btnBackStats" aria-label="Back to Home">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"/>
+              <polyline points="12 19 5 12 12 5"/>
+            </svg>
+          </button>
+          <div class="subview-title">Statistics</div>
+          <button type="button" class="subview-help-btn" id="btnStatsHelp" aria-label="Statistics Help">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-1.5 2-2.5 3v1.5"/>
+              <circle cx="12" cy="17" r="1.1" fill="currentColor" stroke="none"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Range Filter Pills -->
+        <div class="filter-pills-row" role="tablist">
+          <button type="button" class="filter-pill active" data-range="1d">1D</button>
+          <button type="button" class="filter-pill" data-range="1w">1W</button>
+          <button type="button" class="filter-pill" data-range="1m">1M</button>
+          <button type="button" class="filter-pill" data-range="all">All</button>
+        </div>
+
+        <!-- 2x2 Metric Grid -->
+        <div class="metrics-2x2-grid">
+          <!-- 1. Lowest Temp -->
+          <div class="app-card metric-box">
+            <div class="metric-box-icon blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>
+              </svg>
+            </div>
+            <div class="metric-box-texts">
+              <span class="metric-box-label">Lowest Temp</span>
+              <span class="metric-box-val" id="statsLowestVal">-</span>
+            </div>
+          </div>
+
+          <!-- 2. Highest Temp -->
+          <div class="app-card metric-box">
+            <div class="metric-box-icon red">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>
+              </svg>
+            </div>
+            <div class="metric-box-texts">
+              <span class="metric-box-label">Highest Temp</span>
+              <span class="metric-box-val" id="statsHighestVal">-</span>
+            </div>
+          </div>
+
+          <!-- 3. Average Temp -->
+          <div class="app-card metric-box">
+            <div class="metric-box-icon blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="20" x2="18" y2="10"/>
+                <line x1="12" y1="20" x2="12" y2="4"/>
+                <line x1="6" y1="20" x2="6" y2="14"/>
+              </svg>
+            </div>
+            <div class="metric-box-texts">
+              <span class="metric-box-label">Average Temp</span>
+              <span class="metric-box-val" id="statsAverageVal">-</span>
+            </div>
+          </div>
+
+          <!-- 4. Total Cooling Time -->
+          <div class="app-card metric-box">
+            <div class="metric-box-icon blue">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <div class="metric-box-texts">
+              <span class="metric-box-label">Total Cooling Time</span>
+              <span class="metric-box-val font-mono" id="statsCoolingTimeVal">-</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2: Hot Heatsink Thermal Metrics (GPIO1) -->
+        <div class="stats-section-label">Heatsink Hot Side</div>
+        <div class="metrics-3-col-grid">
+          <div class="app-card metric-mini-card">
+            <span class="metric-mini-label">Lowest Hot</span>
+            <span class="metric-mini-val" id="statsLowestHotVal">-</span>
+          </div>
+          <div class="app-card metric-mini-card">
+            <span class="metric-mini-label">Highest Hot</span>
+            <span class="metric-mini-val red" id="statsHighestHotVal">-</span>
+          </div>
+          <div class="app-card metric-mini-card">
+            <span class="metric-mini-label">Average Hot</span>
+            <span class="metric-mini-val" id="statsAverageHotVal">-</span>
+          </div>
+        </div>
+
+        <!-- Section 3: AI Cooling Decisions Distribution -->
+        <div class="app-card ai-stats-card">
+          <div class="card-header-row">
+            <div class="section-heading">Mode Distribution</div>
+            <span class="heading-subtitle" id="statsAiDurationBadge">0 min active</span>
+          </div>
+
+          <div class="ai-decision-dist-row">
+            <div class="ai-dist-item">
+              <span class="ai-dist-label">5V Silent</span>
+              <span class="ai-dist-val" id="statsAiPct5">-</span>
+            </div>
+            <div class="ai-dist-divider"></div>
+            <div class="ai-dist-item">
+              <span class="ai-dist-label">9V Balanced</span>
+              <span class="ai-dist-val" id="statsAiPct9">-</span>
+            </div>
+            <div class="ai-dist-divider"></div>
+            <div class="ai-dist-item">
+              <span class="ai-dist-label">12V Turbo</span>
+              <span class="ai-dist-val" id="statsAiPct12">-</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 4: Temperature History Chart -->
+        <div class="app-card chart-card">
+          <div class="card-header-row">
+            <div class="section-heading">Thermal Timeline</div>
+            <div class="dropdown-pill">
+              <span>Live Session</span>
+            </div>
+          </div>
+
+          <div class="chart-container">
+            <canvas id="statsHistoryChart" width="370" height="160"></canvas>
+            <div class="chart-live-badge" id="statsChartBadge">-</div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ====================================================================
+           VIEW: RGB LED STUDIO SCREEN
+           ==================================================================== -->
+      <section id="viewLed" class="tab-view">
+
+        <!-- Top Navigation Bar for Subview -->
+        <div class="subview-header">
+          <button type="button" class="subview-back-btn" id="btnBackLed" aria-label="Back to Home">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"/>
+              <polyline points="12 19 5 12 12 5"/>
+            </svg>
+          </button>
+          <div class="subview-title">RGB Studio</div>
+          <button type="button" class="subview-help-btn" id="btnLedHelp" aria-label="RGB Help">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-1.5 2-2.5 3v1.5"/>
+              <circle cx="12" cy="17" r="1.1" fill="currentColor" stroke="none"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- 1. Live Interactive 26-Pixel LED Ring Visualizer Card -->
+        <div class="app-card led-preview-card">
+          <div class="led-preview-header">
+            <span class="card-mini-title">LIVE SIMULATOR (26-LED RING)</span>
+            <span class="led-mode-badge" id="ledCurrentModeBadge">BREATHING</span>
+          </div>
+
+          <div class="led-ring-stage">
+            <div class="led-ring-ambient-glow" id="ledRingGlow"></div>
+            <div class="led-ring-container" id="ledRingContainer">
+              <div class="led-pixel-bead" data-index="0" style="--bead-idx: 0;"></div>
+              <div class="led-pixel-bead" data-index="1" style="--bead-idx: 1;"></div>
+              <div class="led-pixel-bead" data-index="2" style="--bead-idx: 2;"></div>
+              <div class="led-pixel-bead" data-index="3" style="--bead-idx: 3;"></div>
+              <div class="led-pixel-bead" data-index="4" style="--bead-idx: 4;"></div>
+              <div class="led-pixel-bead" data-index="5" style="--bead-idx: 5;"></div>
+              <div class="led-pixel-bead" data-index="6" style="--bead-idx: 6;"></div>
+              <div class="led-pixel-bead" data-index="7" style="--bead-idx: 7;"></div>
+              <div class="led-pixel-bead" data-index="8" style="--bead-idx: 8;"></div>
+              <div class="led-pixel-bead" data-index="9" style="--bead-idx: 9;"></div>
+              <div class="led-pixel-bead" data-index="10" style="--bead-idx: 10;"></div>
+              <div class="led-pixel-bead" data-index="11" style="--bead-idx: 11;"></div>
+              <div class="led-pixel-bead" data-index="12" style="--bead-idx: 12;"></div>
+              <div class="led-pixel-bead" data-index="13" style="--bead-idx: 13;"></div>
+              <div class="led-pixel-bead" data-index="14" style="--bead-idx: 14;"></div>
+              <div class="led-pixel-bead" data-index="15" style="--bead-idx: 15;"></div>
+              <div class="led-pixel-bead" data-index="16" style="--bead-idx: 16;"></div>
+              <div class="led-pixel-bead" data-index="17" style="--bead-idx: 17;"></div>
+              <div class="led-pixel-bead" data-index="18" style="--bead-idx: 18;"></div>
+              <div class="led-pixel-bead" data-index="19" style="--bead-idx: 19;"></div>
+              <div class="led-pixel-bead" data-index="20" style="--bead-idx: 20;"></div>
+              <div class="led-pixel-bead" data-index="21" style="--bead-idx: 21;"></div>
+              <div class="led-pixel-bead" data-index="22" style="--bead-idx: 22;"></div>
+              <div class="led-pixel-bead" data-index="23" style="--bead-idx: 23;"></div>
+              <div class="led-pixel-bead" data-index="24" style="--bead-idx: 24;"></div>
+              <div class="led-pixel-bead" data-index="25" style="--bead-idx: 25;"></div>
+              <div class="led-ring-center">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M12 2a4 4 0 0 1 4 4c0 2-2 3-4 6-2-3-4-4-4-6a4 4 0 0 1 4-4z"/>
+                  <path d="M22 12a4 4 0 0 1-4 4c-2 0-3-2-6-4 3-2 4-4 6-4a4 4 0 0 1 4 4z"/>
+                  <path d="M12 22a4 4 0 0 1-4-4c0-2 2-3 4-6 2 3 4 4 4 6a4 4 0 0 1-4 4z"/>
+                  <path d="M2 12a4 4 0 0 1 4-4c2 0 3 2 6 4-3 2-4 4-6 4a4 4 0 0 1-4-4z"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+        <!-- 2. Animation Mode Selection Grid -->
+        <div class="app-card led-effects-card">
+          <div class="section-heading">Animation Mode</div>
+          <div class="led-effect-grid">
+            <button type="button" class="led-effect-tile active" data-effect="BREATH" id="fxBreath">
+              <div class="fx-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M4.93 19.07l14.14-14.14"/></svg>
+              </div>
+              <span class="fx-name">Breathing</span>
+            </button>
+
+            <button type="button" class="led-effect-tile" data-effect="STACK" id="fxStack">
+              <div class="fx-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="6" y="2" width="12" height="20" rx="3"/>
+                  <circle cx="12" cy="7" r="1.5" fill="currentColor"/>
+                  <circle cx="12" cy="13" r="1.5" fill="currentColor"/>
+                  <circle cx="12" cy="18" r="1.5" fill="currentColor"/>
+                </svg>
+              </div>
+              <span class="fx-name">Gravity Drop</span>
+            </button>
+
+            <button type="button" class="led-effect-tile" data-effect="SPIN" id="fxSpin">
+              <div class="fx-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+              </div>
+              <span class="fx-name">Turbine</span>
+            </button>
+
+            <button type="button" class="led-effect-tile" data-effect="DUAL" id="fxDual">
+              <div class="fx-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                  <path d="M3 3v5h5"/>
+                  <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+                  <path d="M21 21v-5h-5"/>
+                </svg>
+              </div>
+              <span class="fx-name">Dual Spin</span>
+            </button>
+
+            <button type="button" class="led-effect-tile" data-effect="RAINBOW" id="fxRainbow">
+              <div class="fx-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 17a10 10 0 0 0-20 0M6 17a6 6 0 0 1 12 0M10 17a2 2 0 0 1 4 0"/></svg>
+              </div>
+              <span class="fx-name">Rainbow</span>
+            </button>
+
+            <button type="button" class="led-effect-tile" data-effect="AURORA" id="fxAurora">
+              <div class="fx-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M2 13c3-3 6-3 9 0s6 3 9 0"/>
+                  <path d="M2 8c3-3 6-3 9 0s6 3 9 0"/>
+                  <path d="M2 18c3-3 6-3 9 0s6 3 9 0"/>
+                </svg>
+              </div>
+              <span class="fx-name">Aurora</span>
+            </button>
+
+            <button type="button" class="led-effect-tile" data-effect="FIRE" id="fxFire">
+              <div class="fx-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 3z"/>
+                </svg>
+              </div>
+              <span class="fx-name">Fire Ember</span>
+            </button>
+
+            <button type="button" class="led-effect-tile" data-effect="METEOR" id="fxMeteor">
+              <div class="fx-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14.5 9.5L3 21M18.5 5.5l-4 4M21 3l-1.5 1.5"/>
+                  <circle cx="19" cy="5" r="2" fill="currentColor"/>
+                </svg>
+              </div>
+              <span class="fx-name">Meteor</span>
+            </button>
+
+            <button type="button" class="led-effect-tile" data-effect="PULSE" id="fxPulse">
+              <div class="fx-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                </svg>
+              </div>
+              <span class="fx-name">Heartbeat</span>
+            </button>
+
+            <button type="button" class="led-effect-tile" data-effect="STROBE" id="fxStrobe">
+              <div class="fx-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              </div>
+              <span class="fx-name">Strobe</span>
+            </button>
+
+            <button type="button" class="led-effect-tile" data-effect="STATIC" id="fxStatic">
+              <div class="fx-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/></svg>
+              </div>
+              <span class="fx-name">Static</span>
+            </button>
+
+            <button type="button" class="led-effect-tile" data-effect="AI" id="fxAi">
+              <div class="fx-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-2.04z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-2.04z"/></svg>
+              </div>
+              <span class="fx-name">AI Sync</span>
+            </button>
+
+            <button type="button" class="led-effect-tile" data-effect="OFF" id="fxOff">
+              <div class="fx-icon-wrap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="1" y1="1" x2="23" y2="23"/><path d="M12 2a10 10 0 0 0-7.07 17.07M16.24 16.24A10 10 0 0 0 12 2"/></svg>
+              </div>
+              <span class="fx-name">Off</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. Color Studio & Swatches -->
+        <div class="app-card led-color-card" id="ledColorCard">
+          <div class="card-header-row">
+            <div class="section-heading">Color Studio</div>
+            <div class="color-picker-input-wrap">
+              <input type="color" id="ledNativeColorPicker" value="#00f0ff" aria-label="Custom Color Picker">
+              <span class="color-hex-tag" id="ledColorHexTag">#00F0FF</span>
+            </div>
+          </div>
+
+          <div class="swatches-grid">
+            <button type="button" class="color-swatch-btn active" data-color="#00f0ff" style="--swatch-c: #00f0ff;" title="Glacier Cyan"></button>
+            <button type="button" class="color-swatch-btn" data-color="#0066ff" style="--swatch-c: #0066ff;" title="Cyber Blue"></button>
+            <button type="button" class="color-swatch-btn" data-color="#a855f7" style="--swatch-c: #a855f7;" title="Neon Purple"></button>
+            <button type="button" class="color-swatch-btn" data-color="#10b981" style="--swatch-c: #10b981;" title="Emerald Green"></button>
+            <button type="button" class="color-swatch-btn" data-color="#f59e0b" style="--swatch-c: #f59e0b;" title="Sunset Gold"></button>
+            <button type="button" class="color-swatch-btn" data-color="#ef4444" style="--swatch-c: #ef4444;" title="Flame Red"></button>
+            <button type="button" class="color-swatch-btn" data-color="#ffffff" style="--swatch-c: #ffffff;" title="Pure White"></button>
+          </div>
+        </div>
+
+        <!-- 4. Brightness & Animation Speed Controls -->
+        <div class="app-card led-slider-card">
+          <div class="led-ctrl-row">
+            <div class="led-ctrl-label-wrap">
+              <span class="led-ctrl-label">Brightness</span>
+              <span class="led-ctrl-val" id="ledBrightnessVal">80%</span>
+            </div>
+            <input type="range" min="5" max="100" value="80" id="ledBrightnessSlider" class="ios-range-slider" aria-label="LED Brightness">
+          </div>
+
+          <div class="led-divider"></div>
+
+          <div class="led-ctrl-row">
+            <div class="led-ctrl-label-wrap">
+              <span class="led-ctrl-label">Animation Speed</span>
+              <span class="led-ctrl-val" id="ledSpeedVal">Normal (1.0x)</span>
+            </div>
+            <div class="speed-pills-row">
+              <button type="button" class="speed-pill" data-speed="slow">Slow</button>
+              <button type="button" class="speed-pill active" data-speed="normal">Normal</button>
+              <button type="button" class="speed-pill" data-speed="fast">Fast</button>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ====================================================================
+           VIEW: ADAPTIVE AI COOLING ENGINE
+           ==================================================================== -->
+      <section id="viewAi" class="tab-view">
+
+        <!-- Top Navigation Bar for Subview -->
+        <div class="subview-header">
+          <button type="button" class="subview-back-btn" id="btnBackAi" aria-label="Back to Home">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"/>
+              <polyline points="12 19 5 12 12 5"/>
+            </svg>
+          </button>
+          <div class="subview-title">Adaptive AI</div>
+          <button type="button" class="subview-help-btn" id="btnAiHelp" aria-label="AI Help">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-1.5 2-2.5 3v1.5"/>
+              <circle cx="12" cy="17" r="1.1" fill="currentColor" stroke="none"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- 1. Hero AI Presentation Card -->
+        <div class="app-card ai-hero-card">
+          <div class="ai-hero-brain-bubble">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-2.04z"/>
+              <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-2.04z"/>
+            </svg>
+          </div>
+
+          <h2 class="ai-hero-title">Adaptive Engine</h2>
+          <div class="ai-hero-tagline">Real-Time Heat Inverter</div>
+        </div>
+
+        <!-- 2. Real-Time Thermal Load Gauge Card -->
+        <div class="app-card adaptive-gauge-card">
+          <div class="gauge-header-row">
+            <div class="section-heading">Thermal Load</div>
+            <span class="ai-status-pill trained" id="aiDecisionStatusPill">
+              <span class="ai-status-dot"></span>
+              <span id="aiDecisionStatusText">ACTIVE INVERTER</span>
+            </span>
+          </div>
+
+          <!-- Dynamic Gauge Bar -->
+          <div class="gauge-track">
+            <div class="gauge-fill" id="aiGaugeFill" style="width: 50%;"></div>
+          </div>
+          <div class="gauge-markers">
+            <span>Idle</span>
+            <span>Balanced</span>
+            <span>Surge</span>
+          </div>
+
+          <!-- 4-Metrics Adaptive Grid -->
+          <div class="adaptive-metrics-grid">
+            <div class="adaptive-metric-box">
+              <div class="adaptive-metric-label">Load</div>
+              <div class="adaptive-metric-value" id="aiThermalLoadVal">50%</div>
+            </div>
+
+            <div class="adaptive-metric-box">
+              <div class="adaptive-metric-label">State</div>
+              <div class="adaptive-metric-value" id="aiActionVal" style="font-size: 13.5px; color: var(--blue-primary);">MAINTAIN</div>
+            </div>
+
+            <div class="adaptive-metric-box">
+              <div class="adaptive-metric-label">Trend</div>
+              <div class="adaptive-metric-value" id="aiColdRateVal" style="font-size: 13px;">+0.0 °C/min</div>
+              <span class="adaptive-trend-pill stable" id="aiTrendPill">→ Stable</span>
+            </div>
+
+            <div class="adaptive-metric-box">
+              <div class="adaptive-metric-label">Output</div>
+              <div class="adaptive-metric-value" id="aiActuationVal" style="font-size: 13px; font-family: var(--font-mono);">--</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Deterministic Hardware Safety Guard Card -->
+        <div class="app-card" id="cardThermalSafetyGuard" style="border-left: 4px solid var(--blue-primary);">
+          <div class="card-header-row" style="margin-bottom: 0;">
+            <div>
+              <div class="section-heading" style="font-size: 13.5px;">Thermal Safety</div>
+              <span class="heading-subtitle">Heatsink Cutoff Guard</span>
+            </div>
+            <span class="temp-status-pill optimal" id="safetyStatusPill" style="padding: 3px 8px; font-size: 11px;">
+              <span class="pill-dot"></span>
+              <span id="safetyStatusPillText">Normal (&lt; 55°C)</span>
+            </span>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ====================================================================
+           VIEW 4: SETTINGS SCREEN
+           ==================================================================== -->
+      <section id="viewSettings" class="tab-view">
+
+        <div class="subview-header">
+          <div class="subview-title" style="margin-left: 0;">Settings</div>
+        </div>
+
+        <!-- Bluetooth Controller Card -->
+        <div class="app-card settings-card">
+          <div class="settings-card-title">Bluetooth Connection</div>
+          <div class="settings-row-item">
+            <span class="settings-item-label">Device Name</span>
+            <span class="settings-item-val" id="settingsDevName">Maestro Cooler</span>
+          </div>
+          <div class="settings-row-item">
+            <span class="settings-item-label">Connection Status</span>
+            <span class="settings-item-val" id="settingsStatusVal">Disconnected</span>
+          </div>
+          <div class="settings-action-wrap">
+            <button type="button" class="btn-primary-block" id="btnSettingsBle">Connect Maestro Cooler</button>
+          </div>
+        </div>
+
+        <!-- AI Engine Architecture Card -->
+        <div class="app-card settings-card">
+          <div class="settings-card-title">AI Engine Architecture</div>
+          <div class="settings-row-item">
+            <span class="settings-item-label">Engine Type</span>
+            <span class="settings-item-val">Adaptive Thermal Inverter</span>
+          </div>
+          <div class="settings-row-item">
+            <span class="settings-item-label">Status</span>
+            <span class="settings-item-val" style="color: var(--blue-primary); font-weight: 700;">EDGE REAL-TIME</span>
+          </div>
+          <div class="settings-row-item">
+            <span class="settings-item-label">Sampling Rate</span>
+            <span class="settings-item-val">1200 ms Non-blocking</span>
+          </div>
+          <div class="settings-row-item">
+            <span class="settings-item-label">Detection Algorithm</span>
+            <span class="settings-item-val">Derivative dT/dt Feedforward</span>
+          </div>
+          <div class="settings-row-item">
+            <span class="settings-item-label">Hardware Safety Override</span>
+            <span class="settings-item-val">Deterministic (&gt;65°C Cutoff)</span>
+          </div>
+        </div>
+
+        <!-- Appearance Theme Card -->
+        <div class="app-card settings-card">
+          <div class="settings-card-title">Appearance</div>
+          <div class="settings-row-item">
+            <span class="settings-item-label">Dark Theme</span>
+            <label class="ios-switch">
+              <input type="checkbox" id="toggleThemeSwitch">
+              <span class="ios-slider"></span>
+            </label>
+          </div>
+          <div class="settings-row-item">
+            <span class="settings-item-label">Welcome Screen</span>
+            <button type="button" class="settings-btn-link" id="btnReplayOnboarding">View</button>
+          </div>
+          <div class="settings-row-item" id="pwaInstallRow">
+            <span class="settings-item-label">Mobile App (PWA)</span>
+            <button type="button" class="settings-btn-link" id="btnInstallPwa">Install</button>
+          </div>
+        </div>
+
+        <!-- Hardware Specs Card -->
+        <div class="app-card settings-card">
+          <div class="settings-card-title">System Specs</div>
+          <div class="settings-row-item">
+            <span class="settings-item-label">Core Unit</span>
+            <span class="settings-item-val">Main Controller</span>
+          </div>
+          <div class="settings-row-item">
+            <span class="settings-item-label">Output</span>
+            <span class="settings-item-val">Power Actuator</span>
+          </div>
+          <div class="settings-row-item">
+            <span class="settings-item-label">Modulation</span>
+            <span class="settings-item-val">Silent PWM (25kHz)</span>
+          </div>
+          <div class="settings-row-item">
+            <span class="settings-item-label">Probe A</span>
+            <span class="settings-item-val">Cold Zone Sensor</span>
+          </div>
+          <div class="settings-row-item">
+            <span class="settings-item-label">Probe B</span>
+            <span class="settings-item-val">Thermal Sink Sensor</span>
+          </div>
+          <div class="settings-row-item">
+            <span class="settings-item-label">Trigger</span>
+            <span class="settings-item-val">Control Button</span>
+          </div>
+          <div class="settings-row-item">
+            <span class="settings-item-label">Protection</span>
+            <span class="settings-item-val">Thermal Safety (&gt;65°C)</span>
+          </div>
+          <div class="settings-row-item">
+            <span class="settings-item-label">Power</span>
+            <span class="settings-item-val">DC Line</span>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- ====================================================================
+         BOTTOM NAVIGATION BAR (Fixed iOS Style Dock)
+         ==================================================================== -->
+    <nav class="bottom-nav-bar" role="navigation" aria-label="Main Navigation">
+      <!-- 1. Home Tab -->
+      <button type="button" class="nav-tab-btn active" data-tab="viewHome" id="tabHome">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        <span>Home</span>
+      </button>
+
+      <!-- 2. Statistics Tab -->
+      <button type="button" class="nav-tab-btn" data-tab="viewStats" id="tabStats">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="20" x2="18" y2="10"/>
+          <line x1="12" y1="20" x2="12" y2="4"/>
+          <line x1="6" y1="20" x2="6" y2="14"/>
+        </svg>
+        <span>Stats</span>
+      </button>
+
+      <!-- 3. RGB LED Studio Tab (NEW) -->
+      <button type="button" class="nav-tab-btn" data-tab="viewLed" id="tabLed">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+        </svg>
+        <span>RGB LED</span>
+      </button>
+
+      <!-- 4. AI Adaptive Tab -->
+      <button type="button" class="nav-tab-btn" data-tab="viewAi" id="tabAi">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-2.04z"/>
+          <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-2.04z"/>
+        </svg>
+        <span>Adaptive AI</span>
+      </button>
+
+      <!-- 5. Settings Tab -->
+      <button type="button" class="nav-tab-btn" data-tab="viewSettings" id="tabSettings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+        <span>Settings</span>
+      </button>
+    </nav>
+
+    <!-- Toast Notification Banner -->
+    <div class="toast-popup" id="appToast">
+      <span class="toast-icon" id="toastIcon">✓</span>
+      <span class="toast-msg" id="toastMsg">Settings updated</span>
+    </div>
+
+  </div>
+
+  <!-- Client-Side Scripts (Modular Pipeline) -->
+  <script src="js/ble.js"></script>
+  <script src="js/temperature.js"></script>
+  <script src="js/statistics.js"></script>
+  <script src="js/dataLogger.js"></script>
+  <script src="js/ai.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
